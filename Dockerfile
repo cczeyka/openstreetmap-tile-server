@@ -3,6 +3,10 @@ FROM ubuntu:18.04
 # Based on
 # https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
 
+# inject own mapnik.xml & shapefiles
+USER root
+COPY shapefiles /shapefiles
+
 # Install dependencies
 RUN apt-get update
 RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev \
@@ -83,7 +87,6 @@ RUN chown renderer /var/run/renderd
 RUN echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" >> /etc/apache2/conf-available/mod_tile.conf
 RUN a2enconf mod_tile
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
-USER renderer
 
 
 # Start running
