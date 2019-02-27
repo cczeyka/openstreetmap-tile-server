@@ -23,7 +23,7 @@ if [ "$1" = "import" ]; then
     # Download Luxembourg as sample if no data is provided
     if [ ! -f /data.osm.pbf ]; then
         echo "WARNING: No import file at /data.osm.pbf, so importing Luxembourg as example..."
-        wget -nv http://download.geofabrik.de/europe/luxembourg-latest.osm.pbf -O /data.osm.pbf
+        wget -nv https://download.geofabrik.de/europe/germany-latest.osm.pbf -O /data.osm.pbf
     fi
 
     # Import data
@@ -39,6 +39,10 @@ if [ "$1" = "run" ]; then
 
     # Configure renderd threads
     sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS:-4}/g" /usr/local/etc/renderd.conf
+
+    if [ -f /shapefiles/mapnik.xml ]; then
+	cp -f /shapefiles/mapnik.xml /home/renderer/src/openstreetmap-carto/
+    fi
 
     # Run
     sudo -u renderer renderd -f -c /usr/local/etc/renderd.conf
