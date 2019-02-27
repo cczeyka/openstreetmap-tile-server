@@ -5,7 +5,15 @@ FROM ubuntu:18.04
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler libfreetype6-dev libtiff5-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev liblua5.2-dev ttf-unifont lua5.1 liblua5.1-dev libgeotiff-epsg
+RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev \
+    libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler \
+    libfreetype6-dev libtiff5-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev \
+    liblua5.2-dev ttf-unifont lua5.1 liblua5.1-dev libgeotiff-epsg \
+    make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
+    libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
+    autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont
+
 
 # Set up environment and renderer user
 ENV TZ=UTC
@@ -18,8 +26,6 @@ RUN mkdir /home/renderer/src
 WORKDIR /home/renderer/src
 RUN git clone https://github.com/openstreetmap/osm2pgsql.git
 WORKDIR /home/renderer/src/osm2pgsql
-USER root
-RUN apt-get install -y make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev
 USER renderer
 RUN mkdir build
 WORKDIR /home/renderer/src/osm2pgsql/build
@@ -30,8 +36,6 @@ RUN make install
 USER renderer
 
 # Install and test Mapnik
-USER root
-RUN apt-get -y install autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev mapnik-utils python-mapnik
 USER renderer
 RUN python -c 'import mapnik'
 
@@ -63,10 +67,6 @@ RUN carto project.mml > mapnik.xml
 WORKDIR /home/renderer/src/openstreetmap-carto
 RUN scripts/get-shapefiles.py
 
-# Install fonts
-USER root
-RUN apt-get install -y fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont
-USER renderer
 
 # Configure renderd
 USER root
@@ -85,10 +85,6 @@ RUN a2enconf mod_tile
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 USER renderer
 
-# Install PostgreSQL
-USER root
-RUN apt-get install -y postgresql postgresql-contrib postgis postgresql-10-postgis-2.4
-USER renderer
 
 # Start running
 USER root
