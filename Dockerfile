@@ -59,6 +59,8 @@ RUN chown renderer /var/run/renderd
 RUN echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" >> /etc/apache2/conf-available/mod_tile.conf
 RUN a2enconf mod_tile
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
+RUN ln -sf /proc/1/fd/1 /var/log/apache2/access.log && ln -sf /proc/1/fd/2 /var/log/apache2/error.log
+
 
 # inject own mapnik.xml & shapefiles
 USER root
