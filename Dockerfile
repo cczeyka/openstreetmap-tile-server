@@ -3,9 +3,6 @@ FROM ubuntu:18.04
 # Based on
 # https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
 
-# inject own mapnik.xml & shapefiles
-USER root
-COPY shapefiles /shapefiles
 
 # Install dependencies
 RUN apt-get update
@@ -16,7 +13,7 @@ RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-esse
     make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
     libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
     autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
-    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo
 
 
 # Set up environment and renderer user
@@ -88,10 +85,9 @@ RUN echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" >> /etc/a
 RUN a2enconf mod_tile
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
 
-
-# Start running
+# inject own mapnik.xml & shapefiles
 USER root
-RUN apt-get install -y sudo
+COPY shapefiles /shapefiles
 
 WORKDIR /shapefiles
 RUN unzip -o "*.zip"
