@@ -92,6 +92,10 @@ COPY apache.conf /etc/apache2/sites-available/000-default.conf
 # Start running
 USER root
 RUN apt-get install -y sudo
+
+WORKDIR /shapefiles
+RUN unzip -o "*.zip"
+
 COPY run.sh /
 ENTRYPOINT ["/run.sh"]
 CMD []
