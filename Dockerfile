@@ -13,7 +13,8 @@ RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-esse
     make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
     libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
     autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
-    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
+    rm -rf /var/lib/apt/lists/*
 
 
 # Set up environment and renderer user
@@ -41,6 +42,31 @@ RUN make install-mod_tile
 RUN ldconfig
 RUN rm -rf /home/renderer/src/mod_tile
 
+########################################################################
+
+FROM ubuntu:18.04
+
+# Install dependencies
+RUN apt-get update
+RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev \
+    libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler \
+    libfreetype6-dev libtiff5-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev \
+    liblua5.2-dev ttf-unifont lua5.1 liblua5.1-dev libgeotiff-epsg \
+    make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
+    libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
+    autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set up environment and renderer user
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN adduser --disabled-password --gecos "" renderer
+
+COPY --from=build /usr/local /usr/local
+COPY --from=build /home/renderer /home/renderer
+RUN ldconfig
+
 USER renderer
 RUN mkdir /home/renderer/src/openstreetmap-carto
 
@@ -65,7 +91,6 @@ RUN ln -sf /proc/1/fd/1 /var/log/apache2/access.log && ln -sf /proc/1/fd/2 /var/
 # inject own mapnik.xml & shapefiles
 USER root
 COPY shapefiles /shapefiles
-
 WORKDIR /shapefiles
 RUN unzip -o "*.zip"
 
