@@ -49,10 +49,8 @@ FROM ubuntu:18.04
 # Install dependencies
 RUN apt-get update
 RUN apt-get install -y unzip libtool \
-    munin-node munin \
     apache2 \
     ttf-unifont libgeotiff-epsg \
-    gdal-bin \
     mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
     rm -rf /var/lib/apt/lists/*
 
