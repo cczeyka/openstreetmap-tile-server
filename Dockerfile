@@ -41,21 +41,6 @@ RUN make install-mod_tile
 RUN ldconfig
 USER renderer
 
-# Configure stylesheet
-WORKDIR /home/renderer/src
-RUN git clone https://github.com/gravitystorm/openstreetmap-carto.git
-WORKDIR /home/renderer/src/openstreetmap-carto
-USER root
-RUN apt-get install -y npm nodejs
-RUN npm install -g carto
-USER renderer
-RUN carto -v
-RUN carto project.mml > mapnik.xml
-
-# Load shapefiles
-WORKDIR /home/renderer/src/openstreetmap-carto
-RUN scripts/get-shapefiles.py
-
 
 # Configure renderd
 USER root
