@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS build
 
 # Based on
 # https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
@@ -13,7 +13,8 @@ RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-esse
     make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
     libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
     autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
-    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
+    rm -rf /var/lib/apt/lists/*
 
 
 # Set up environment and renderer user
@@ -39,6 +40,33 @@ USER root
 RUN make install
 RUN make install-mod_tile
 RUN ldconfig
+RUN rm -rf /home/renderer/src/mod_tile
+
+########################################################################
+
+FROM ubuntu:18.04
+
+# Install dependencies
+RUN apt-get update
+RUN apt-get install -y unzip libtool \
+    munin-node munin \
+    apache2 \
+    ttf-unifont libgeotiff-epsg \
+    gdal-bin \
+    mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY --from=build /usr/local /usr/local
+COPY --from=build /home/renderer /home/renderer
+COPY --from=build /usr/lib/apache2/modules /usr/lib/apache2/modules
+
+# Set up environment and renderer user
+ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN adduser --disabled-password --gecos "" renderer
+
+RUN ldconfig
+RUN chown -R renderer /home/renderer
 
 USER renderer
 RUN mkdir /home/renderer/src/openstreetmap-carto
@@ -58,11 +86,12 @@ RUN chown renderer /var/run/renderd
 RUN echo "LoadModule tile_module /usr/lib/apache2/modules/mod_tile.so" >> /etc/apache2/conf-available/mod_tile.conf
 RUN a2enconf mod_tile
 COPY apache.conf /etc/apache2/sites-available/000-default.conf
+RUN ln -sf /proc/1/fd/1 /var/log/apache2/access.log && ln -sf /proc/1/fd/2 /var/log/apache2/error.log
+
 
 # inject own mapnik.xml & shapefiles
 USER root
 COPY shapefiles /shapefiles
-
 WORKDIR /shapefiles
 RUN unzip -o "*.zip"
 
