@@ -48,13 +48,11 @@ FROM ubuntu:18.04
 
 # Install dependencies
 RUN apt-get update
-RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-essential autoconf libtool libxml2-dev \
-    libgeos-dev libgeos++-dev libpq-dev libbz2-dev libproj-dev munin-node munin libprotobuf-c0-dev protobuf-c-compiler \
-    libfreetype6-dev libtiff5-dev libicu-dev libgdal-dev libcairo-dev libcairomm-1.0-dev apache2 apache2-dev libagg-dev \
-    liblua5.2-dev ttf-unifont lua5.1 liblua5.1-dev libgeotiff-epsg \
-    make cmake g++ libboost-dev libboost-system-dev libboost-filesystem-dev libexpat1-dev zlib1g-dev libbz2-dev \
-    libpq-dev libgeos-dev libgeos++-dev libproj-dev lua5.2 liblua5.2-dev \
-    autoconf apache2-dev libtool libxml2-dev libbz2-dev libgeos-dev libgeos++-dev libproj-dev gdal-bin libmapnik-dev \
+RUN apt-get install -y unzip libtool \
+    munin-node munin \
+    apache2 \
+    ttf-unifont libgeotiff-epsg \
+    gdal-bin \
     mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
     rm -rf /var/lib/apt/lists/*
 
