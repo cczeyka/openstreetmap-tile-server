@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS build
 
 # Based on
 # https://switch2osm.org/manually-building-a-tile-server-18-04-lts/
@@ -39,6 +39,7 @@ USER root
 RUN make install
 RUN make install-mod_tile
 RUN ldconfig
+RUN rm -rf /home/renderer/src/mod_tile
 
 USER renderer
 RUN mkdir /home/renderer/src/openstreetmap-carto
