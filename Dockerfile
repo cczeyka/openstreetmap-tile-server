@@ -22,20 +22,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN adduser --disabled-password --gecos "" renderer
 USER renderer
 
-# Install latest osm2pgsql
-RUN mkdir /home/renderer/src
-WORKDIR /home/renderer/src
-RUN git clone https://github.com/openstreetmap/osm2pgsql.git
-WORKDIR /home/renderer/src/osm2pgsql
-USER renderer
-RUN mkdir build
-WORKDIR /home/renderer/src/osm2pgsql/build
-RUN cmake ..
-RUN make
-USER root
-RUN make install
-USER renderer
-
 # Install and test Mapnik
 USER renderer
 RUN python -c 'import mapnik'
