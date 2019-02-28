@@ -39,8 +39,9 @@ USER root
 RUN make install
 RUN make install-mod_tile
 RUN ldconfig
-USER renderer
 
+USER renderer
+RUN mkdir /home/renderer/src/openstreetmap-carto
 
 # Configure renderd
 USER root
