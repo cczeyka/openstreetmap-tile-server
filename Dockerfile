@@ -60,6 +60,7 @@ RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-esse
 
 COPY --from=build /usr/local /usr/local
 COPY --from=build /home/renderer /home/renderer
+COPY --from=build /usr/lib/apache2/modules /usr/lib/apache2/modules
 
 # Set up environment and renderer user
 ENV TZ=UTC
