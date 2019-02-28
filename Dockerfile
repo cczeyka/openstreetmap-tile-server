@@ -67,7 +67,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN adduser --disabled-password --gecos "" renderer
 
 RUN ldconfig
-RUN ls -la /home/renderer
+RUN chown -R renderer /home/renderer
 
 USER renderer
 RUN mkdir /home/renderer/src/openstreetmap-carto
