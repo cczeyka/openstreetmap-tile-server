@@ -58,14 +58,16 @@ RUN apt-get install -y libboost-all-dev git-core tar unzip wget bzip2 build-esse
     mapnik-utils python-mapnik fonts-noto-cjk fonts-noto-hinted fonts-noto-unhinted ttf-unifont sudo  && \
     rm -rf /var/lib/apt/lists/*
 
+COPY --from=build /usr/local /usr/local
+COPY --from=build /home/renderer /home/renderer
+
 # Set up environment and renderer user
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN adduser --disabled-password --gecos "" renderer
 
-COPY --from=build /usr/local /usr/local
-COPY --from=build /home/renderer /home/renderer
 RUN ldconfig
+RUN ls -la /home/renderer
 
 USER renderer
 RUN mkdir /home/renderer/src/openstreetmap-carto
